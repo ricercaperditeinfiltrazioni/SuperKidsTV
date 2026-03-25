@@ -1,0 +1,61 @@
+name: super_kids_tv
+description: App TV sicura per bambini - niente pubblicità, niente Shorts.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # --- Player Video ---
+  video_player: ^2.8.6          # Player nativo per stream HLS/m3u8 e file MP4
+  chewie: ^1.7.4                 # UI player con controlli personalizzabili
+
+  # --- YouTube (no ads, no shorts) ---
+  youtube_explode_dart: ^2.2.0  # Estrae stream YouTube senza API key e senza pubblicità
+
+  # --- Networking & JSON ---
+  http: ^1.2.1                  # Chiamate HTTP per Rai Play / Mediaset
+  dio: ^5.4.3                   # Client HTTP avanzato con interceptor
+
+  # --- State Management ---
+  provider: ^6.1.2              # Gestione stato semplice e robusta
+
+  # --- Persistenza dati ---
+  shared_preferences: ^2.2.3    # Salva PIN, canali, profilo attivo
+  flutter_secure_storage: ^9.0.0 # Salva PIN in modo sicuro (keystore Android)
+
+  # --- UI ---
+  flutter_svg: ^2.0.10+1        # Per icone SVG dei canali
+  cached_network_image: ^3.3.1  # Cache immagini/loghi canali
+  google_fonts: ^6.2.1          # Font arrotondati e leggibili per bambini
+  animate_do: ^3.3.4            # Animazioni semplici per la schermata profili
+  lottie: ^3.1.0                # Animazioni Lottie (stelline, caricamento)
+
+  # --- Utilità ---
+  wakelock_plus: ^1.2.5         # Impedisce allo schermo di spegnersi durante i video
+  permission_handler: ^11.3.1   # Richiede permessi Android (internet, storage)
+  package_info_plus: ^8.0.0     # Versione app (utile nel pannello genitore)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1  # Genera icona dell'app
+
+# --- Configurazione icona app ---
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/app_icon.png"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/channels/
+    - assets/icon/
+    - assets/animations/
