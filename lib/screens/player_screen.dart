@@ -60,18 +60,20 @@ class _PlayerScreenState extends State<PlayerScreen> {
       String videoId;
 
       if (url.contains('watch?v=')) {
+        // È un video singolo
         videoId = url.split('watch?v=')[1].split('&')[0];
       } else if (url.contains('youtu.be/')) {
         videoId = url.split('youtu.be/')[1];
       } else {
-        // È un canale — prende il primo video
-        final channelObj = await ytExplode.channels.getByUrl(url);
-        final uploads = ytExplode.channels.getUploads(channelObj.id);
+        // È un canale — prende il primo video dalla lista upload
+        final channelPage = await ytExplode.channels.get(url);
+        final uploads = ytExplode.channels.getUploads(channelPage.id);
         final video = await uploads.first;
         videoId = video.id.value;
       }
 
-      final manifest = await ytExplode.videos.streamsClient.getManifest(videoId);
+      final manifest =
+          await ytExplode.videos.streamsClient.getManifest(videoId);
       final streamInfo = manifest.muxed.withHighestBitrate();
       await _initStreamPlayer(streamInfo.url.toString());
     } finally {
@@ -96,8 +98,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
         bufferedColor: Colors.white38,
       ),
       placeholder: Container(color: Colors.black),
-      errorBuilder: (context, errorMessage) =>
-          Center(child: Text(errorMessage, style: const TextStyle(color: Colors.white))),
+      errorBuilder: (context, errorMessage) => Center(
+        child: Text(errorMessage,
+            style: const TextStyle(color: Colors.white)),
+      ),
     );
 
     setState(() => _isLoading = false);
@@ -116,7 +120,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 children: [
                   CircularProgressIndicator(color: Colors.pinkAccent),
                   SizedBox(height: 16),
-                  Text('Caricamento...', style: TextStyle(color: Colors.white70)),
+                  Text('Caricamento...',
+                      style: TextStyle(color: Colors.white70)),
                 ],
               ),
             )
@@ -132,35 +137,45 @@ class _PlayerScreenState extends State<PlayerScreen> {
           else
             Chewie(controller: _chewieController!),
 
+          // Pulsante chiudi
           Positioned(
-            top: 16, left: 16,
+            top: 16,
+            left: 16,
             child: SafeArea(
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(12)),
-                  child: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 28),
                 ),
               ),
             ),
           ),
 
+          // Nome canale
           Positioned(
-            top: 16, right: 16,
+            top: 16,
+            right: 16,
             child: SafeArea(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(12)),
-                child: Text(widget.channel.name,
-                    style: GoogleFonts.nunito(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16)),
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  widget.channel.name,
+                  style: GoogleFonts.nunito(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16),
+                ),
               ),
             ),
           ),
