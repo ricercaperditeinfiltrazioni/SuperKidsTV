@@ -1,8 +1,5 @@
 // lib/providers/channel_provider.dart
-// Gestisce i canali disponibili e il timer di spegnimento
-
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/channel.dart';
@@ -11,9 +8,8 @@ import '../models/profile.dart';
 class ChannelProvider extends ChangeNotifier {
   List<Channel> _allChannels = List.from(defaultChannels);
 
-  // Timer di spegnimento
   Timer? _sleepTimer;
-  int _sleepTimerMinutes = 0;     // 0 = disattivato
+  int _sleepTimerMinutes = 0;
   int _remainingSeconds = 0;
   bool _timerExpired = false;
 
@@ -22,7 +18,6 @@ class ChannelProvider extends ChangeNotifier {
   int get remainingSeconds => _remainingSeconds;
   bool get timerExpired => _timerExpired;
 
-  // Canali filtrati in base al profilo
   List<Channel> channelsForProfile(ProfileType type) {
     switch (type) {
       case ProfileType.baby:
@@ -33,8 +28,6 @@ class ChannelProvider extends ChangeNotifier {
         return _allChannels;
     }
   }
-
-  // --- Gestione canali (solo genitore) ---
 
   void addChannel(Channel channel) {
     _allChannels.add(channel);
@@ -47,14 +40,6 @@ class ChannelProvider extends ChangeNotifier {
     _saveChannels();
     notifyListeners();
   }
-
-  void toggleChannelForBaby(String channelId, bool enabled) {
-    // In una vera app qui si creerebbe un oggetto aggiornato
-    // Per semplicità usiamo la lista come mutabile
-    notifyListeners();
-  }
-
-  // --- Timer di spegnimento ---
 
   void setSleepTimer(int minutes) {
     _sleepTimer?.cancel();
@@ -102,13 +87,8 @@ class ChannelProvider extends ChangeNotifier {
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
-  // --- Persistenza ---
-
   Future<void> _saveChannels() async {
-    // Salva solo i canali custom aggiunti dal genitore
-    // I canali default sono hardcoded
     final prefs = await SharedPreferences.getInstance();
-    // Implementazione semplificata — in produzione serializza i channel
     await prefs.setInt('channels_count', _allChannels.length);
   }
 
