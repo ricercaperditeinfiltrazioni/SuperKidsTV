@@ -11,42 +11,41 @@ dependencies:
     sdk: flutter
 
   # --- Player Video ---
-  video_player: ^2.8.6          # Player nativo per stream HLS/m3u8 e file MP4
-  chewie: ^1.7.4                 # UI player con controlli personalizzabili
+  video_player: ^2.8.6
+  chewie: ^1.5.0                 # versione compatibile con Flutter 3.22
 
   # --- YouTube (no ads, no shorts) ---
-  youtube_explode_dart: ^2.2.0  # Estrae stream YouTube senza API key e senza pubblicità
+  youtube_explode_dart: ^1.6.0  # versione con API stabile
 
   # --- Networking & JSON ---
-  http: ^1.2.1                  # Chiamate HTTP per Rai Play / Mediaset
-  dio: ^5.4.3                   # Client HTTP avanzato con interceptor
+  http: ^1.2.1
+  dio: ^5.4.3
 
   # --- State Management ---
-  provider: ^6.1.2              # Gestione stato semplice e robusta
+  provider: ^6.1.2
 
   # --- Persistenza dati ---
-  shared_preferences: ^2.2.3    # Salva PIN, canali, profilo attivo
-  flutter_secure_storage: ^9.0.0 # Salva PIN in modo sicuro (keystore Android)
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.0.0
 
   # --- UI ---
-  flutter_svg: ^2.0.10+1        # Per icone SVG dei canali
-  cached_network_image: ^3.3.1  # Cache immagini/loghi canali
-  google_fonts: ^6.2.1          # Font arrotondati e leggibili per bambini
-  animate_do: ^3.3.4            # Animazioni semplici per la schermata profili
-  lottie: ^3.1.0                # Animazioni Lottie (stelline, caricamento)
+  flutter_svg: ^2.0.10+1
+  cached_network_image: ^3.3.1
+  google_fonts: ^6.2.1
+  animate_do: ^3.3.4
+  lottie: ^3.1.0
 
   # --- Utilità ---
-  wakelock_plus: ^1.2.5         # Impedisce allo schermo di spegnersi durante i video
-  permission_handler: ^11.3.1   # Richiede permessi Android (internet, storage)
-  package_info_plus: ^8.0.0     # Versione app (utile nel pannello genitore)
+  wakelock_plus: ^1.2.5
+  permission_handler: ^11.3.1
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  flutter_launcher_icons: ^0.13.1  # Genera icona dell'app
+  flutter_launcher_icons: ^0.13.1
 
-# --- Configurazione icona app ---
 flutter_launcher_icons:
   android: true
   ios: false
