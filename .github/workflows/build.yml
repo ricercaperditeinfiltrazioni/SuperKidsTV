@@ -1,1 +1,87 @@
+# ============================================================
+#  SuperKidsTV — Build automatica APK con GitHub Actions
+#  Si attiva ogni volta che fai "commit" sul branch main
+# ============================================================
 
+name: 🔨 Build APK SuperKidsTV
+
+on:
+  push:
+    branches: [ "main" ]        # Si avvia ad ogni push sul branch main
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:             # Permette avvio manuale dal pannello Actions
+
+jobs:
+  build:
+    name: Build APK Flutter
+    runs-on: ubuntu-latest      # GitHub usa un server Linux gratuito
+
+    steps:
+
+      # 1. Scarica il tuo codice dal repository
+      - name: 📥 Checkout codice
+        uses: actions/checkout@v4
+
+      # 2. Installa Java (richiesto da Android SDK)
+      - name: ☕ Installa Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Installa Flutter (versione stabile)
+      - name: 🐦 Installa Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'   # Versione stabile — aggiornala quando vuoi
+          channel: 'stable'
+          cache: true                  # Mette in cache Flutter per build più veloci
+
+      # 4. Scarica tutte le dipendenze del pubspec.yaml
+      - name: 📦 Installa dipendenze (flutter pub get)
+        run: flutter pub get
+
+      # 5. Genera le icone dell'app (richiede l'immagine in assets/icon/)
+      - name: 🖼️ Genera icone app
+        run: flutter pub run flutter_launcher_icons
+        continue-on-error: true       # Non blocca la build se manca l'icona
+
+      # 6. Analisi statica del codice (facoltativa ma utile)
+      - name: 🔍 Analisi codice
+        run: flutter analyze --no-fatal-infos
+        continue-on-error: true
+
+      # 7. Compila l'APK in modalità release (ottimizzata)
+      - name: 🏗️ Compila APK Release
+        run: flutter build apk --release --split-per-abi
+        # --split-per-abi crea APK separati per arm64, armv7, x86
+        # Risultato: build/app/outputs/flutter-apk/
+
+      # 8. Rinomina l'APK con la data per riconoscerlo facilmente
+      - name: 📝 Rinomina APK
+        run: |
+          DATE=$(date +'%Y-%m-%d_%H-%M')
+          mkdir -p artifacts
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
+             artifacts/SuperKidsTV_${DATE}_arm64.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk \
+             artifacts/SuperKidsTV_${DATE}_arm32.apk || true
+
+      # 9. Carica gli APK nella sezione "Artifacts" di GitHub Actions
+      - name: 📤 Carica APK su GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: SuperKidsTV-APK
+          path: artifacts/*.apk
+          retention-days: 30          # Conserva gli APK per 30 giorni
+
+      # 10. (BONUS) Crea una Release ufficiale ad ogni push
+      #     Scommentare le righe qui sotto per abilitarlo
+      # - name: 🚀 Crea Release GitHub
+      #   uses: softprops/action-gh-release@v2
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     files: artifacts/*.apk
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
