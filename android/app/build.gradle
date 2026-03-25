@@ -1,0 +1,22 @@
+android {
+    namespace "com.example.super_kids_tv"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.super_kids_tv"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0"
+}
