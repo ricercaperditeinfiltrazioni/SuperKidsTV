@@ -12,12 +12,12 @@ dependencies:
 
   # --- Player Video ---
   video_player: ^2.8.6
-  chewie: ^1.5.0                 # versione compatibile con Flutter 3.22
+  chewie: ^1.5.0
 
   # --- YouTube (no ads, no shorts) ---
-  youtube_explode_dart: ^1.6.0  # versione con API stabile
+  youtube_explode_dart: ^2.5.3
 
-  # --- Networking & JSON ---
+  # --- Networking ---
   http: ^1.2.1
   dio: ^5.4.3
 
@@ -29,7 +29,6 @@ dependencies:
   flutter_secure_storage: ^9.0.0
 
   # --- UI ---
-  flutter_svg: ^2.0.10+1
   cached_network_image: ^3.3.1
   google_fonts: ^6.2.1
   animate_do: ^3.3.4
