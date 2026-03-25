@@ -60,14 +60,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
       String videoId;
 
       if (url.contains('watch?v=')) {
-        // È un video singolo
         videoId = url.split('watch?v=')[1].split('&')[0];
       } else if (url.contains('youtu.be/')) {
         videoId = url.split('youtu.be/')[1];
       } else {
-        // È un canale — prende il primo video dalla lista upload
-        final channelPage = await ytExplode.channels.get(url);
-        final uploads = ytExplode.channels.getUploads(channelPage.id);
+        // È un canale YouTube — prende il primo video
+        // Estrae l'ID del canale dall'URL e carica gli upload
+        final channelId = await yt_lib.ChannelId.fromString(url);
+        final uploads = ytExplode.channels.getUploads(channelId);
         final video = await uploads.first;
         videoId = video.id.value;
       }
@@ -137,10 +137,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
           else
             Chewie(controller: _chewieController!),
 
-          // Pulsante chiudi
           Positioned(
-            top: 16,
-            left: 16,
+            top: 16, left: 16,
             child: SafeArea(
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
@@ -157,25 +155,20 @@ class _PlayerScreenState extends State<PlayerScreen> {
             ),
           ),
 
-          // Nome canale
           Positioned(
-            top: 16,
-            right: 16,
+            top: 16, right: 16,
             child: SafeArea(
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  widget.channel.name,
-                  style: GoogleFonts.nunito(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16),
-                ),
+                child: Text(widget.channel.name,
+                    style: GoogleFonts.nunito(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16)),
               ),
             ),
           ),
