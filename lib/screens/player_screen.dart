@@ -1,5 +1,4 @@
 // lib/screens/player_screen.dart
-// Player video custom — senza chewie, controlli puliti per bambini
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -31,7 +30,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     ]);
     WakelockPlus.enable();
     _initPlayer();
-    // Nascondi i controlli dopo 3 secondi
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) setState(() => _showControls = false);
     });
@@ -61,16 +59,39 @@ class _PlayerScreenState extends State<PlayerScreen> {
     try {
       final url = widget.channel.sourceUrl;
       String videoId;
+
       if (url.contains('watch?v=')) {
         videoId = url.split('watch?v=')[1].split('&')[0];
       } else if (url.contains('youtu.be/')) {
-        videoId = url.split('youtu.be/')[1];
-      } else {
-        final channelId = yt_lib.ChannelId.fromString(url);
+        videoId = url.split('youtu.be/')[1].split('?')[0];
+      } else if (url.contains('/@') || url.contains('/c/') || url.contains('/user/')) {
+        String handle;
+        if (url.contains('/@')) {
+          handle = url.split('/@')[1].split('/')[0];
+        } else if (url.contains('/c/')) {
+          handle = url.split('/c/')[1].split('/')[0];
+        } else {
+          handle = url.split('/user/')[1].split('/')[0];
+        }
+        final channel = await yt.channels.getByUsername(handle);
+        final uploads = yt.channels.getUploads(channel.id);
+        final video = await uploads.first;
+        videoId = video.id.value;
+      } else if (url.contains('/channel/')) {
+        final rawId = url.split('/channel/')[1].split('/')[0];
+        final channelId = yt_lib.ChannelId(rawId);
         final uploads = yt.channels.getUploads(channelId);
         final video = await uploads.first;
         videoId = video.id.value;
+      } else if (url.startsWith('UC') || url.startsWith('HC')) {
+        final channelId = yt_lib.ChannelId(url);
+        final uploads = yt.channels.getUploads(channelId);
+        final video = await uploads.first;
+        videoId = video.id.value;
+      } else {
+        throw Exception('Formato URL non riconosciuto: $url');
       }
+
       final manifest = await yt.videos.streamsClient.getManifest(videoId);
       final stream = manifest.muxed.withHighestBitrate();
       await _initStream(stream.url.toString());
@@ -110,7 +131,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
         onTap: _toggleControls,
         child: Stack(
           children: [
-            // ── Video ──
             if (_isLoading)
               const Center(child: CircularProgressIndicator(color: Colors.pinkAccent))
             else if (_error != null)
@@ -118,8 +138,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Text(_error!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 16)),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.redAccent, fontSize: 16)),
                 ),
               )
             else
@@ -130,12 +150,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
               ),
 
-            // ── Controlli sovrapposti ──
             if (_showControls && !_isLoading && _error == null) ...[
-              // Sfondo scuro semi-trasparente
               Container(color: Colors.black38),
 
-              // Pulsante indietro
               Positioned(
                 top: 16, left: 16,
                 child: SafeArea(
@@ -153,7 +170,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
               ),
 
-              // Nome canale
               Positioned(
                 top: 16, right: 16,
                 child: SafeArea(
@@ -164,15 +180,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(widget.channel.name,
-                        style: GoogleFonts.nunito(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16)),
+                      style: GoogleFonts.nunito(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16)),
                   ),
                 ),
               ),
 
-              // Play/Pause centrale
               Center(
                 child: GestureDetector(
                   onTap: () {
@@ -185,14 +200,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   },
                   child: Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black54,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _controller!.value.isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
                       color: Colors.white,
                       size: 56,
                     ),
@@ -200,7 +215,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
               ),
 
-              // Barra progresso in basso
               Positioned(
                 bottom: 0, left: 0, right: 0,
                 child: SafeArea(
@@ -222,15 +236,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            Text(
-                              _formatDuration(_controller!.value.position),
-                              style: const TextStyle(color: Colors.white70, fontSize: 12),
-                            ),
+                            Text(_formatDuration(_controller!.value.position),
+                              style: const TextStyle(color: Colors.white70, fontSize: 12)),
                             const Spacer(),
-                            Text(
-                              _formatDuration(_controller!.value.duration),
-                              style: const TextStyle(color: Colors.white70, fontSize: 12),
-                            ),
+                            Text(_formatDuration(_controller!.value.duration),
+                              style: const TextStyle(color: Colors.white70, fontSize: 12)),
                           ],
                         ),
                       ],
@@ -240,12 +250,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             ],
 
-            // Buffer indicator
-            if (!_isLoading && _error == null &&
-                _controller!.value.isBuffering)
-              const Center(
-                child: CircularProgressIndicator(color: Colors.white54),
-              ),
+            if (!_isLoading && _error == null && _controller!.value.isBuffering)
+              const Center(child: CircularProgressIndicator(color: Colors.white54)),
           ],
         ),
       ),
